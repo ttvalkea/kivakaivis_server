@@ -1,17 +1,9 @@
 "use strict";
-// import express from "express";
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-// const app = express();
-// const port = 3001;
-// app.get("/", (req, res) => {
-//   res.send("Response from kivakaivis_server");
-// });
-// app.listen(port, () => {
-//   console.log(`Example app listening at http://localhost:${port}`);
-// });
+exports.userDisconnect = exports.getCurrentUser = exports.joinUser = void 0;
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const socket = require("socket.io");
@@ -22,9 +14,38 @@ app.use(cors_1.default());
 var server = app.listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`);
 });
-const io = socket(server);
+const io = socket(server, {
+    cors: {
+        origin: "http://localhost:3000", // TODO: Need to be changed before deploying
+    },
+});
+const users = [];
+// joins the user to the specific chatroom
+function joinUser(id, userName, room) {
+    const user = { id, userName, room };
+    users.push(user);
+    console.log(users, "users");
+    return user;
+}
+exports.joinUser = joinUser;
+console.log("user out", users);
+// Gets a particular user id to return the current user
+function getCurrentUser(id) {
+    return users.find((u) => u.id === id);
+}
+exports.getCurrentUser = getCurrentUser;
+// called when the user leaves the chat and its user object deleted from array
+function userDisconnect(id) {
+    const index = users.findIndex((u) => u.id === id);
+    if (index !== -1) {
+        return users.splice(index, 1)[0];
+    }
+}
+exports.userDisconnect = userDisconnect;
 //initializing the socket io connection
 io.on("connection", (socket) => {
+    console.log("connected");
+    console.log(socket.id);
     //for a new user joining the room
     socket.on("joinRoom", ({ userName, roomName }) => {
         //* create user
@@ -43,6 +64,14 @@ io.on("connection", (socket) => {
             username: user.userName,
             text: `${user.userName} has joined the chat`,
         });
+    });
+    //Test, receiving a message
+    socket.on("hello", (text) => {
+        // Receive
+        console.log("Hello message received:", text);
+        // Send
+        // socket.emit("greetings", "a greeting");
+        io.to(socket.id).emit("greetings", "a greeting!");
     });
     //user sending message
     socket.on("chat", (text) => {
