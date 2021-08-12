@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.userDisconnect = exports.getCurrentUser = exports.joinUser = void 0;
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
+const constants_1 = require("./constants");
 const socket = require("socket.io");
 const app = express_1.default();
 app.use(express_1.default());
@@ -65,6 +66,12 @@ io.on("connection", (socket) => {
             text: `${user.userName} has joined the chat`,
         });
     });
+    socket.on(constants_1.EMIT_NAME_UPDATE_PLAYER_POSITION, (info) => {
+        // Receive
+        console.log(constants_1.EMIT_NAME_UPDATE_PLAYER_POSITION, info);
+        socket.broadcast.emit(constants_1.EMIT_NAME_UPDATE_PLAYER_POSITION, Object.assign(Object.assign({}, info), { playerId: socket.id }));
+    });
+    // TODO: Remove all the useless stuff
     //Test, receiving a message
     socket.on("hello", (text) => {
         // Receive
