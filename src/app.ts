@@ -26,7 +26,7 @@ io.on("connection", (socket) => {
 
   socket.on(
     EMIT_NAME_UPDATE_PLAYER_POSITION,
-    (info: { x: Number; y: Number }) => {
+    (info: { x: number; y: number }) => {
       // Receive
       console.log(EMIT_NAME_UPDATE_PLAYER_POSITION, info);
       socket.broadcast.emit(EMIT_NAME_UPDATE_PLAYER_POSITION, {
