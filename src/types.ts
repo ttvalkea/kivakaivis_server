@@ -4,3 +4,12 @@ export type PlayerType = {
   x: number;
   y: number;
 };
+
+export type renderedObjectType = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
+export type obstacleType = renderedObjectType & { destructible: boolean };
