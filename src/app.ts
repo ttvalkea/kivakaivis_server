@@ -6,7 +6,7 @@ import {
   EMIT_NAME_START_NEW_GAME,
   EMIT_NAME_UPDATE_PLAYER_POSITION,
 } from "./constants";
-import { obstacleType, PlayerType } from "./types";
+import { mapTileType, PlayerType } from "./types";
 import { generateObstaclesForNewGame } from "./gameMechanics";
 
 const socket = require("socket.io");
@@ -27,7 +27,9 @@ const io = socket(server, {
   },
 });
 
+// Persistent values
 let players: PlayerType[] = [];
+let mapTiles: mapTileType[] = [];
 
 //initializing the socket io connection
 io.on("connection", (socket) => {
@@ -67,7 +69,7 @@ io.on("connection", (socket) => {
   // A new game starting request
   socket.on(EMIT_NAME_START_NEW_GAME, () => {
     // When a player requests a new game start, generate a new map. The position of all players in the lobby is done in the frontend upon receiving the new map.
-    const obstacles: obstacleType[] = generateObstaclesForNewGame();
-    io.emit(EMIT_NAME_START_NEW_GAME, obstacles);
+    mapTiles = generateObstaclesForNewGame();
+    io.emit(EMIT_NAME_START_NEW_GAME, mapTiles);
   });
 });
