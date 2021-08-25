@@ -16,12 +16,14 @@ export type renderedObjectType = {
 
 export type obstacleType = renderedObjectType & { destructible: boolean };
 
-// Map tiles are converted into renderedObjectTypes in the frontend so that each tile's position is multiplied by tile size (25)
+// Map tiles are converted into renderedObjectTypes in the frontend so that each tile's position is multiplied by tile size (25). A mapTile can span many grid tiles.
 export type mapTileType = {
   gridX: number;
   gridY: number;
   type: mapTileTerrain;
   isDiscovered: boolean; // A tile becomes discovered (normally) when a player digs it. Before being discovered, all tiles look like dirt.
+  widthInTiles: number;
+  heightInTiles: number;
 };
 
 export enum mapTileTerrain {
