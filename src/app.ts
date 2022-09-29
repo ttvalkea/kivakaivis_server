@@ -2,12 +2,21 @@ import express from "express";
 import cors from "cors";
 import {
   EMIT_NAME_REMOVE_PLAYER,
+  EMIT_NAME_SET_NEARBY_OBSTACLES,
   EMIT_NAME_SET_OTHER_PLAYERS_LIST,
   EMIT_NAME_START_NEW_GAME,
   EMIT_NAME_UPDATE_PLAYER_POSITION,
+  PLAYER_HEIGHT,
+  PLAYER_WIDTH,
+  SCREEN_HEIGHT,
+  SCREEN_WIDTH,
+  TILE_SIZE_IN_PX,
 } from "./constants";
 import { mapTileType, PlayerType } from "./types";
-import { generateObstaclesForNewGame } from "./gameMechanics";
+import {
+  generateObstaclesForNewGame,
+  isItemInPlayersView,
+} from "./gameMechanics";
 
 const socket = require("socket.io");
 const app = express();
@@ -51,6 +60,29 @@ io.on("connection", (socket) => {
     (info: { x: number; y: number }) => {
       // Receive
       console.log(EMIT_NAME_UPDATE_PLAYER_POSITION, info);
+
+      // Send the player their nearby obstacles
+      io.to(socket.id).emit(
+        EMIT_NAME_SET_NEARBY_OBSTACLES,
+        mapTiles.filter((tile) =>
+          isItemInPlayersView(
+            {
+              x: info.x,
+              y: info.y,
+              height: PLAYER_WIDTH,
+              width: PLAYER_HEIGHT,
+            },
+            {
+              x: tile.gridX * TILE_SIZE_IN_PX,
+              y: tile.gridY * TILE_SIZE_IN_PX,
+              height: tile.heightInTiles * TILE_SIZE_IN_PX,
+              width: tile.widthInTiles * TILE_SIZE_IN_PX,
+            },
+            SCREEN_HEIGHT,
+            SCREEN_WIDTH
+          )
+        )
+      );
 
       // Update player position in player list
       const playerInPlayersList = players.find((x) => x.playerId === socket.id);

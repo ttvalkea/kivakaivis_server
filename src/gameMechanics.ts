@@ -1,5 +1,5 @@
 import { MAP_HEIGHT_IN_TILES, MAP_WIDTH_IN_TILES } from "./constants";
-import { mapTileTerrain, mapTileType } from "./types";
+import { mapTileTerrain, mapTileType, renderedObjectType } from "./types";
 
 export const generateObstaclesForNewGame = (): mapTileType[] => {
   const obstacleArrays: mapTileType[][] = [
@@ -145,4 +145,24 @@ const formBiggerObstacles = (
     }
   }
   return combinedObstacleArray;
+};
+
+export const isItemInPlayersView = (
+  player: renderedObjectType,
+  item: renderedObjectType,
+  viewHeight: number,
+  viewWidth: number
+) => {
+  const isVisible =
+    // Outside, right of the player
+    item.x - player.x - player.width / 2 <= viewWidth / 2 &&
+    // Outside, left of the player
+    item.x - player.x - player.width / 2 + item.width >= (viewWidth / 2) * -1 &&
+    // Outside, below the player
+    item.y - player.y - player.height / 2 <= viewHeight / 2 &&
+    // Outside, above the player
+    item.y - player.y - player.height / 2 + item.height >=
+      (viewHeight / 2) * -1;
+
+  return isVisible;
 };

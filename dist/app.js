@@ -39,6 +39,18 @@ io.on("connection", (socket) => {
     socket.on(constants_1.EMIT_NAME_UPDATE_PLAYER_POSITION, (info) => {
         // Receive
         console.log(constants_1.EMIT_NAME_UPDATE_PLAYER_POSITION, info);
+        // Send the player their nearby obstacles
+        io.to(socket.id).emit(constants_1.EMIT_NAME_SET_NEARBY_OBSTACLES, mapTiles.filter((tile) => gameMechanics_1.isItemInPlayersView({
+            x: info.x,
+            y: info.y,
+            height: constants_1.PLAYER_WIDTH,
+            width: constants_1.PLAYER_HEIGHT,
+        }, {
+            x: tile.gridX * constants_1.TILE_SIZE_IN_PX,
+            y: tile.gridY * constants_1.TILE_SIZE_IN_PX,
+            height: tile.heightInTiles * constants_1.TILE_SIZE_IN_PX,
+            width: tile.widthInTiles * constants_1.TILE_SIZE_IN_PX,
+        }, constants_1.SCREEN_HEIGHT, constants_1.SCREEN_WIDTH)));
         // Update player position in player list
         const playerInPlayersList = players.find((x) => x.playerId === socket.id);
         if (playerInPlayersList) {
